@@ -1,6 +1,7 @@
 import { Client, GatewayIntentBits } from "discord.js";
+import { CommandKit } from "commandkit";
 
-const bot = new Client({
+const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
         GatewayIntentBits.GuildMembers,
@@ -9,10 +10,9 @@ const bot = new Client({
     ],
 });
 
-// ready
-
-bot.on("ready", () => {
-    console.log("✅ Bot is ready");
+new CommandKit({
+    client: client,
+    eventsPath: `${__dirname}/events`,
 });
 
-bot.login(process.env.TOKEN);
+client.login(process.env.TOKEN);
