@@ -13,6 +13,7 @@ const client = new Client({
 new CommandKit({
     client: client,
     eventsPath: `${__dirname}/events`,
+    commandsPath: `${__dirname}/commands`,
 });
 
 client.login(process.env.TOKEN);
