@@ -1,9 +1,12 @@
 // Economy
-export const dailyReward = 50;
+export const dailyReward = {
+    amount: 50,
+    cooldown: "1d",
+};
 export const begReward = {
     min: 10,
     max: 50,
-    chance: 90,
+    chance: 40,
     cooldown: "1h",
 };
 

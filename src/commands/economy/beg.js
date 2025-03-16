@@ -12,25 +12,27 @@ export async function run({ interaction }) {
         const userId = interaction.user.id;
         const endsAt = Date.now() + ms(begReward.cooldown);
 
-        let cooldown = await getCooldown(commandName, userId);
         let user = await getUser(userId, "userId balance");
+        if (!user) {
+            user = await createUser(userId);
+        }
 
+        let cooldown = await getCooldown(commandName, userId);
         if (cooldown && Date.now() < cooldown.endsAt) {
             interaction.editReply(
-                `beg already used. Try again in ${ms(
+                `Beg already used. Try again in ${ms(
                     cooldown.endsAt - Date.now()
                 )}`
             );
             return;
         }
 
-        if (!user) {
-            user = await createUser(userId);
-        }
-
         if (!cooldown) {
             cooldown = await createCooldown(commandName, userId);
         }
+
+        cooldown.endsAt = endsAt;
+        await cooldown.save();
 
         if (rollChance(begReward.chance)) {
             const reward = getRandomNumber(begReward.min, begReward.max);
@@ -45,8 +47,6 @@ export async function run({ interaction }) {
         } else {
             interaction.editReply("You begged but got nothing");
         }
-        cooldown.endsAt = endsAt;
-        await cooldown.save();
     } catch (error) {
         console.log(`⭕ Error handling /beg: ${error}`);
     }

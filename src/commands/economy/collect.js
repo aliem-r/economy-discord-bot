@@ -1,36 +1,45 @@
+import ms from "ms";
 import { createUser, getUser } from "../../db/user.js";
 import { dailyReward } from "../../settings.js";
 import { formatBalance } from "../../utils.js";
+import { createCooldown, getCooldown } from "../../db/cooldown.js";
 
 export async function run({ interaction }) {
     try {
         await interaction.deferReply();
 
+        const commandName = data.name;
         const userId = interaction.user.id;
+        const endsAt = Date.now() + ms(dailyReward.cooldown);
 
         let user = await getUser(userId);
-
-        if (user) {
-            const lastDailyCollect = user.lastDailyCollect?.toDateString();
-            const currentDate = new Date().toDateString();
-
-            if (lastDailyCollect === currentDate) {
-                interaction.editReply("You already collected today");
-                return;
-            }
-        } else {
+        if (!user) {
             user = await createUser(userId);
         }
 
-        user.balance += dailyReward;
-        user.lastDailyCollect = new Date();
+        let cooldown = await getCooldown(commandName, userId);
+        if (cooldown && Date.now() < cooldown.endsAt) {
+            interaction.editReply(
+                `Daily already collected. Try again in ${ms(
+                    cooldown.endsAt - Date.now()
+                )}`
+            );
+            return;
+        }
 
-        await user.save();
+        if (!cooldown) {
+            cooldown = await createCooldown(commandName, userId);
+        }
+
+        user.balance += dailyReward.amount;
+        cooldown.endsAt = endsAt;
+
+        await Promise.all([user.save(), cooldown.save()]);
 
         interaction.editReply(
             `${formatBalance(
-                dailyReward
-            )} collected!\n New balance: ${formatBalance(user.balance)}`
+                dailyReward.amount
+            )} collected!\n🔹New balance: ${formatBalance(user.balance)}`
         );
     } catch (error) {
         console.log(`⭕ Error handling /collect: ${error}`);
