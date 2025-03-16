@@ -1,11 +1,14 @@
-import { User } from "../../../schemas/User.js";
-import settings from "../../settings.js";
+import { createUser, getUser } from "../../db/user.js";
+import { dailyReward } from "../../settings.js";
+import { formatBalance } from "../../utils.js";
 
 export async function run({ interaction }) {
     try {
         await interaction.deferReply();
 
-        let user = await User.findOne({ userId: interaction.user.id });
+        const userId = interaction.user.id;
+
+        let user = await getUser(userId);
 
         if (user) {
             const lastDailyCollect = user.lastDailyCollect?.toDateString();
@@ -16,16 +19,18 @@ export async function run({ interaction }) {
                 return;
             }
         } else {
-            user = new User({ userId: interaction.user.id });
+            user = await createUser(userId);
         }
 
-        user.balance += settings.dailyReward;
+        user.balance += dailyReward;
         user.lastDailyCollect = new Date();
 
         await user.save();
 
         interaction.editReply(
-            `${settings.dailyReward}🪙 Collected!\n New balance: ${user.balance}`
+            `${formatBalance(
+                dailyReward
+            )} collected!\n New balance: ${formatBalance(user.balance)}`
         );
     } catch (error) {
         console.log(`⭕ Error handling /collect: ${error}`);
@@ -34,7 +39,7 @@ export async function run({ interaction }) {
 
 export const data = {
     name: "collect",
-    description: "Collects daily reward",
+    description: `Collects daily reward of ${formatBalance(dailyReward)}`,
 };
 
 export const options = {
