@@ -10,7 +10,10 @@ export async function run({ interaction }) {
 
         const commandName = data.name;
         const userId = interaction.user.id;
-        const endsAt = Date.now() + ms(dailyReward.cooldown);
+        const endsAt = new Date(Date.now() + ms(dailyReward.cooldown));
+        endsAt.setHours(1, 0, 0, 0);
+        const currentDate = new Date();
+        currentDate.setHours(1, 0, 0, 0);
 
         let user = await getUser(userId);
         if (!user) {
@@ -18,11 +21,9 @@ export async function run({ interaction }) {
         }
 
         let cooldown = await getCooldown(commandName, userId);
-        if (cooldown && Date.now() < cooldown.endsAt) {
+        if (cooldown && cooldown.endsAt > currentDate) {
             interaction.editReply(
-                `Daily already collected. Try again in ${ms(
-                    cooldown.endsAt - Date.now()
-                )}`
+                "Daily already collected. Try again tomorrow!"
             );
             return;
         }
