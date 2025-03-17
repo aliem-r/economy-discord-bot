@@ -1,8 +1,8 @@
 import ms from "ms";
-import { createUser, getUser } from "../../db/user.js";
+import { createUser, getUser } from "../../repository/user.js";
 import { dailyReward } from "../../settings.js";
 import { formatBalance } from "../../utils.js";
-import { createCooldown, getCooldown } from "../../db/cooldown.js";
+import { createCooldown, getCooldown } from "../../repository/cooldown.js";
 
 export async function run({ interaction }) {
     try {
@@ -49,7 +49,9 @@ export async function run({ interaction }) {
 
 export const data = {
     name: "collect",
-    description: `Collects daily reward of ${formatBalance(dailyReward)}`,
+    description: `Collects daily reward of ${formatBalance(
+        dailyReward.amount
+    )}`,
 };
 
 export const options = {

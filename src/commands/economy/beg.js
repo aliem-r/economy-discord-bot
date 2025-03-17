@@ -1,6 +1,6 @@
 import ms from "ms";
-import { createCooldown, getCooldown } from "../../db/cooldown";
-import { createUser, getUser } from "../../db/user";
+import { createCooldown, getCooldown } from "../../repository/cooldown";
+import { createUser, getUser } from "../../repository/user";
 import { formatBalance, getRandomNumber, rollChance } from "../../utils";
 import { begReward } from "../../settings";
 
@@ -54,8 +54,7 @@ export async function run({ interaction }) {
 
 export const data = {
     name: "beg",
-    description:
-        "Beg for some coins. Chance: 40% | Reward: 10-50 | Cooldown: 1h",
+    description: `Beg for some coins. Chance: ${begReward.chance}% | Reward: ${begReward.min}-${begReward.max} | Cooldown: ${begReward.cooldown}`,
 };
 
 export const options = {
