@@ -49,7 +49,7 @@ export async function run({ interaction }) {
 
 export const data = {
     name: "collect",
-    description: `Collects daily reward of ${formatBalance(
+    description: `Collect the daily reward of ${formatBalance(
         dailyReward.amount
     )}`,
 };
