@@ -5,7 +5,6 @@ const cooldownSchema = new Schema(
         commandName: {
             type: String,
             required: true,
-            unique: true,
         },
         userId: {
             type: String,
