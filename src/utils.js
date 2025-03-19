@@ -11,5 +11,5 @@ export function rollChance(percent) {
 
 // Formats a number as a currency
 export function formatBalance(amount) {
-    return amount.toLocaleString() + " €";
+    return `**${amount.toLocaleString()} €**`;
 }
