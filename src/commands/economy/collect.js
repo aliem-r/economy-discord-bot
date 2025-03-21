@@ -1,6 +1,6 @@
 import ms from "ms";
 import { createUser, getUser } from "../../repository/user.js";
-import { dailyReward } from "../../settings.js";
+import { dailyConfig } from "../../settings.js";
 import { formatBalance } from "../../utils.js";
 import { createCooldown, getCooldown } from "../../repository/cooldown.js";
 
@@ -10,7 +10,7 @@ export async function run({ interaction }) {
 
         const commandName = data.name;
         const userId = interaction.user.id;
-        const endsAt = new Date(Date.now() + ms(dailyReward.cooldown));
+        const endsAt = new Date(Date.now() + ms(dailyConfig.cooldown));
         endsAt.setHours(1, 0, 0, 0);
         const currentDate = new Date();
         currentDate.setHours(1, 0, 0, 0);
@@ -32,14 +32,14 @@ export async function run({ interaction }) {
             cooldown = await createCooldown(commandName, userId);
         }
 
-        user.balance += dailyReward.amount;
+        user.balance += dailyConfig.amount;
         cooldown.endsAt = endsAt;
 
         await Promise.all([user.save(), cooldown.save()]);
 
         interaction.editReply(
             `${formatBalance(
-                dailyReward.amount
+                dailyConfig.amount
             )} collected!\n🔹New balance: ${formatBalance(user.balance)}`
         );
     } catch (error) {
@@ -50,7 +50,7 @@ export async function run({ interaction }) {
 export const data = {
     name: "collect",
     description: `Collect the daily reward of ${formatBalance(
-        dailyReward.amount
+        dailyConfig.amount
     )}`,
 };
 

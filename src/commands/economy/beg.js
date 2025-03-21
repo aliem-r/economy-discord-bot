@@ -2,7 +2,7 @@ import ms from "ms";
 import { createCooldown, getCooldown } from "../../repository/cooldown";
 import { createUser, getUser } from "../../repository/user";
 import { formatBalance, getRandomNumber, rollChance } from "../../utils";
-import { begReward } from "../../settings";
+import { begConfig } from "../../settings";
 
 export async function run({ interaction }) {
     try {
@@ -10,7 +10,7 @@ export async function run({ interaction }) {
 
         const commandName = data.name;
         const userId = interaction.user.id;
-        const endsAt = Date.now() + ms(begReward.cooldown);
+        const endsAt = Date.now() + ms(begConfig.cooldown);
 
         let user = await getUser(userId, "userId balance");
         if (!user) {
@@ -34,8 +34,8 @@ export async function run({ interaction }) {
         cooldown.endsAt = endsAt;
         await cooldown.save();
 
-        if (rollChance(begReward.chance)) {
-            const reward = getRandomNumber(begReward.min, begReward.max);
+        if (rollChance(begConfig.chance)) {
+            const reward = getRandomNumber(begConfig.min, begConfig.max);
             user.balance += reward;
             await user.save();
 
@@ -54,7 +54,7 @@ export async function run({ interaction }) {
 
 export const data = {
     name: "beg",
-    description: `Beg for some coins. Chance: ${begReward.chance}% | Reward: ${begReward.min}-${begReward.max} | Cooldown: ${begReward.cooldown}`,
+    description: `Beg for some coins. Chance: ${begConfig.chance}% | Reward: ${begConfig.min}-${begConfig.max} | Cooldown: ${begConfig.cooldown}`,
 };
 
 export const options = {
